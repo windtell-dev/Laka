@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Laka — Profile</title>
+<link rel="stylesheet" href="app.css"/>
+<script defer src="app.js"></script>
+ <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="mark">🌿</div>
+      <a href="Laka.html">Laka</a>
+    </div>
+
+    <nav class="nav">
+      <a href="Laka.html">Home</a>
+<a href="community.html">Community</a>
+<a href="profile.html">Profile</a>
+
+    </nav>
+
+    <div class="chip">Account</div>
+  </header>
+
+  <div class="shell shell--no-sidebar">
+    <main class="main">
+      <div class="h1">account</div>
+      <div class="muted" style="font-size:16px; margin-bottom:14px;">
+        Log in to edit your bio, add friends, track events attended, and see your impact.
+      </div>
+
+      <div class="panel">
+        <!-- LOGGED OUT -->
+        <div id="viewLoggedOut">
+          <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
+            <div class="panel" style="background: var(--paper);">
+              <div class="h2" style="font-size:22px;">log in</div>
+
+              <form id="loginForm" class="form">
+                <div class="field">
+                  <div class="label">email</div>
+                  <input id="loginEmail" class="input" type="email" placeholder="you@school.edu" autocomplete="email"/>
+                </div>
+                <div class="field">
+                  <div class="label">password</div>
+                  <input id="loginPassword" class="input" type="password" placeholder="••••••••" autocomplete="current-password"/>
+                </div>
+                <button class="btn" type="submit">log in</button>
+                <div id="loginMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
+              </form>
+
+              <div class="hr"></div>
+              <div class="muted" style="font-size:13px;">open via: <span class="chip">http://localhost:3000/profile.html</span></div>
+            </div>
+
+            <div class="panel" style="background: var(--paper);">
+              <div class="h2" style="font-size:22px;">create account</div>
+
+              <form id="signupForm" class="form">
+                <div class="field">
+                  <div class="label">display name</div>
+                  <input id="signupDisplayName" class="input" placeholder="windtell"/>
+                </div>
+                <div class="field">
+                  <div class="label">username</div>
+                  <input id="signupUsername" class="input" placeholder="windtell-dev"/>
+                </div>
+                <div class="field">
+                  <div class="label">email</div>
+                  <input id="signupEmail" class="input" type="email" placeholder="you@school.edu"/>
+                </div>
+                <div class="field">
+                  <div class="label">password</div>
+                  <input id="signupPassword" class="input" type="password" placeholder="••••••••"/>
+                </div>
+                <button class="btn" type="submit">create</button>
+                <div id="signupMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- LOGGED IN -->
+        <div id="viewLoggedIn" style="display:none;">
+          <div class="panel" style="background: var(--paper);">
+            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+              <div>
+                <div class="h2" style="font-size:22px;">profile</div>
+                <div id="whoLine" class="muted"></div>
+              </div>
+              <button class="btn" id="logoutBtn" type="button">log out</button>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="panel" style="background: var(--panel);">
+              <div class="h2" style="font-size:22px;">your impact</div>
+              <div class="muted" style="font-size:16px;">
+                Estimated CO₂ saved:
+                <b id="impactKg">0.0</b> kg
+              </div>
+              <div class="muted" style="font-size:13px; margin-top:6px;" id="impactNote">
+                Based on events attended (hackathon estimate).
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
+              <div class="panel" style="background: var(--panel);">
+                <div class="h2" style="font-size:22px;">bio</div>
+                <textarea id="bioInput" class="textarea" placeholder="add a short bio..."></textarea>
+                <button class="btn" id="saveBioBtn" type="button" style="margin-top:10px;">save bio</button>
+                <div id="bioMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
+              </div>
+
+              <div class="panel" style="background: var(--panel);">
+                <div class="h2" style="font-size:22px;">friends</div>
+                <div class="muted">total: <span id="friendsCount">0</span></div>
+                <div class="hr"></div>
+
+                <div class="label">add friend username</div>
+                <input id="friendUsername" class="input" placeholder="teammate-name"/>
+                <button class="btn" id="addFriendBtn" type="button" style="margin-top:10px;">add friend</button>
+                <div id="friendMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
+
+                <ul id="friendsList" class="list"></ul>
+              </div>
+            </div>
+
+            <div class="hr"></div>
+
+            <div class="panel" style="background: var(--panel);">
+              <div class="h2" style="font-size:22px;">events attended</div>
+              <div class="muted">total: <span id="eventsCount">0</span></div>
+
+              <div class="hr"></div>
+
+              <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
+                <div>
+                  <div class="label">event title</div>
+                  <input id="eventTitle" class="input" placeholder="neighborhood cleanup"/>
+                  <div class="label" style="margin-top:10px;">date (optional)</div>
+                  <input id="eventDate" class="input" placeholder="2026-02-14"/>
+                  <div class="label" style="margin-top:10px;">location (optional)</div>
+                  <input id="eventLocation" class="input" placeholder="mission district"/>
+                  <button class="btn" id="addEventBtn" type="button" style="margin-top:10px;">add</button>
+                  <div id="eventMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
+                </div>
+
+                <div>
+                  <ul id="eventsList" class="list"></ul>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+<script>
+  // ---- helpers ----
+  const $ = (id) => document.getElementById(id);
+
+  async function api(path, opts = {}) {
+    const res = await fetch(path, {
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      ...opts,
+    });
+    let data = null;
+    try { data = await res.json(); } catch {}
+    if (!res.ok) {
+      const msg = (data && (data.error || data.details)) ? (data.error || data.details) : `HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  function showLoggedOut() {
+    $("viewLoggedOut").style.display = "";
+    $("viewLoggedIn").style.display = "none";
+  }
+  function showLoggedIn() {
+    $("viewLoggedOut").style.display = "none";
+    $("viewLoggedIn").style.display = "";
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, (c) => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+    }[c]));
+  }
+
+  function renderFriends(friends) {
+    const ul = $("friendsList");
+    ul.innerHTML = "";
+    if (!friends || friends.length === 0) {
+      ul.innerHTML = `<li class="item"><div class="title">no friends yet</div></li>`;
+      $("friendsCount").textContent = "0";
+      return;
+    }
+    $("friendsCount").textContent = String(friends.length);
+    friends.forEach(f => {
+      const li = document.createElement("li");
+      li.className = "item";
+      li.innerHTML = `<div class="title">${esc(f.display_name)} <span class="meta">@${esc(f.username)}</span></div>`;
+      ul.appendChild(li);
+    });
+  }
+
+  function renderEvents(events) {
+    const ul = $("eventsList");
+    ul.innerHTML = "";
+    if (!events || events.length === 0) {
+      ul.innerHTML = `<li class="item"><div class="title">no events yet</div></li>`;
+      $("eventsCount").textContent = "0";
+      return;
+    }
+    $("eventsCount").textContent = String(events.length);
+    events.forEach(ev => {
+      const li = document.createElement("li");
+      li.className = "item";
+      const meta = [ev.event_date, ev.location].filter(Boolean).join(" • ");
+      li.innerHTML = `<div class="title">${esc(ev.event_title)}</div><div class="meta">${esc(meta || "")}</div>`;
+      ul.appendChild(li);
+    });
+  }
+
+  async function refreshImpact(){
+    try{
+      const data = await api("/api/me/impact");
+      $("impactKg").textContent = String(data.kg_saved);
+      $("impactNote").textContent = `Based on ${data.events} event(s) × ${data.kg_per_event} kg/event (hackathon estimate).`;
+    } catch {}
+  }
+
+  async function refreshAll() {
+    const me = await api("/api/me");
+    const u = me.user;
+
+    showLoggedIn();
+
+    $("whoLine").innerHTML =
+      `<div><b>${esc(u.display_name)}</b> <span class="muted">@${esc(u.username)}</span></div>` +
+      `<div class="muted">${esc(u.email)}</div>`;
+
+    $("bioInput").value = u.bio || "";
+
+    const [friends, events] = await Promise.all([
+      api("/api/me/friends"),
+      api("/api/me/events"),
+    ]);
+
+    renderFriends(friends.friends);
+    renderEvents(events.events);
+    await refreshImpact();
+  }
+
+  // ---- auth handlers ----
+  $("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("loginMsg").textContent = "";
+    try {
+      await api("/api/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email: $("loginEmail").value.trim(),
+          password: $("loginPassword").value.trim(),
+        }),
+      });
+      await refreshAll();
+    } catch (err) {
+      $("loginMsg").textContent = `login failed: ${err.message}`;
+    }
+  });
+
+  $("signupForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    $("signupMsg").textContent = "";
+    try {
+      await api("/api/signup", {
+        method: "POST",
+        body: JSON.stringify({
+          display_name: $("signupDisplayName").value.trim(),
+          username: $("signupUsername").value.trim(),
+          email: $("signupEmail").value.trim(),
+          password: $("signupPassword").value.trim(),
+        }),
+      });
+      await refreshAll();
+    } catch (err) {
+      $("signupMsg").textContent = `signup failed: ${err.message}`;
+    }
+  });
+
+  $("logoutBtn").addEventListener("click", async () => {
+    try { await api("/api/logout", { method: "POST" }); } catch {}
+    showLoggedOut();
+  });
+
+  // ---- actions ----
+  $("saveBioBtn").addEventListener("click", async () => {
+    $("bioMsg").textContent = "";
+    try {
+      await api("/api/me/bio", {
+        method: "POST",
+        body: JSON.stringify({ bio: $("bioInput").value }),
+      });
+      $("bioMsg").textContent = "saved ✓";
+      await refreshAll();
+    } catch (err) {
+      $("bioMsg").textContent = `error: ${err.message}`;
+    }
+  });
+
+  $("addFriendBtn").addEventListener("click", async () => {
+    $("friendMsg").textContent = "";
+    const username = $("friendUsername").value.trim().replace(/^@/, "");
+    if (!username) { $("friendMsg").textContent = "enter a username."; return; }
+
+    try {
+      await api("/api/me/friends/add", {
+        method: "POST",
+        body: JSON.stringify({ username }),
+      });
+      $("friendUsername").value = "";
+      $("friendMsg").textContent = "added ✓";
+      const friends = await api("/api/me/friends");
+      renderFriends(friends.friends);
+    } catch (err) {
+      $("friendMsg").textContent = `error: ${err.message}`;
+    }
+  });
+
+  $("addEventBtn").addEventListener("click", async () => {
+    $("eventMsg").textContent = "";
+    const event_title = $("eventTitle").value.trim();
+    if (!event_title) { $("eventMsg").textContent = "event title required."; return; }
+
+    try {
+      await api("/api/me/events/attend", {
+        method: "POST",
+        body: JSON.stringify({
+          event_title,
+          event_date: $("eventDate").value.trim() || null,
+          location: $("eventLocation").value.trim() || null,
+        }),
+      });
+
+      $("eventTitle").value = "";
+      $("eventDate").value = "";
+      $("eventLocation").value = "";
+
+      $("eventMsg").textContent = "added ✓";
+      const events = await api("/api/me/events");
+      renderEvents(events.events);
+      await refreshImpact();
+    } catch (err) {
+      $("eventMsg").textContent = `error: ${err.message}`;
+    }
+  });
+
+  // ---- boot ----
+  (async function boot() {
+    try { await refreshAll(); }
+    catch { showLoggedOut(); }
+  })();
+</script>
+</body>
+</html>
