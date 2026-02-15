@@ -4,13 +4,110 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Laka — Profile</title>
-<link rel="stylesheet" href="app.css"/>
-<script defer src="app.js"></script>
- <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<link rel="stylesheet" href="/app.css"/>
+<script defer src="/app.js"></script>
+
+
+  <!-- Page-local styles that respect your aesthetic -->
+  <style>
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 22px 18px 40px; }
+    .lead { color: rgba(0,0,0,.62); margin-top: 8px; }
+
+    .grid2 { display:grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 980px){ .grid2 { grid-template-columns: 1fr; } }
+
+    .cardish{
+      border: 2px solid rgba(0,0,0,.12);
+      border-radius: 14px;
+      background: rgba(255,255,255,.55);
+      padding: 16px;
+    }
+
+    .field { display:flex; flex-direction:column; gap: 6px; margin: 10px 0; }
+    .label { font-size: 13px; color: rgba(0,0,0,.60); }
+    .input, .select, .textarea{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,.18);
+      font: inherit;
+      background: rgba(255,255,255,.6);
+    }
+    .textarea{ min-height: 92px; resize: vertical; }
+
+    .btnline { display:flex; gap: 10px; flex-wrap: wrap; align-items:center; margin-top: 10px; }
+    .btnlite{
+      border: 2px solid rgba(106,62,62,.55);
+      background: transparent;
+      border-radius: 999px;
+      padding: 8px 14px;
+      cursor:pointer;
+      font-size: 14px;
+      color: #3a2a2a;
+    }
+    .btnlite.primary{ background: #6a3e3e; color:#fff; border-color:#6a3e3e; }
+    .tiny { font-size: 12px; color: rgba(0,0,0,.55); }
+
+    /* Profile header */
+    .phead{ display:flex; gap: 18px; align-items:center; }
+    .avatar{
+      width: 74px; height: 74px; border-radius: 50%;
+      border: 2px solid rgba(106,62,62,.55);
+      background: radial-gradient(circle at 30% 30%, rgba(205,219,210,.9), rgba(255,255,255,.5));
+      display:flex; align-items:center; justify-content:center;
+      font-size: 26px;
+    }
+    .pmeta h1{ margin:0; font-size: 52px; letter-spacing: -0.5px; }
+    .handle{ color: rgba(0,0,0,.6); margin-top: 2px; }
+
+    .counts{ display:flex; gap: 18px; flex-wrap:wrap; margin-top: 12px; }
+    .count{
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.55);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-width: 140px;
+    }
+    .count b{ font-size: 20px; display:block; }
+    .count span{ color: rgba(0,0,0,.6); font-size: 13px; }
+
+    .tabs{ display:flex; gap: 10px; margin-top: 14px; }
+    .tab{
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.55);
+      padding: 8px 12px;
+      border-radius: 999px;
+      cursor:pointer;
+      opacity: .85;
+    }
+    .tab.active{ background:#111; color:#fff; border-color:#111; opacity: 1; }
+
+    .list{ list-style:none; padding:0; margin: 12px 0 0; display:flex; flex-direction:column; gap: 10px; }
+    .item{
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.55);
+      border-radius: 14px;
+      padding: 12px;
+    }
+    .item .title{ font-weight: 800; }
+    .item .meta{ color: rgba(0,0,0,.6); font-size: 13px; margin-top: 4px; }
+    .pillrow{ display:flex; gap: 8px; flex-wrap:wrap; margin-top: 8px; }
+    .pill{
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.05);
+      border: 1px solid rgba(0,0,0,.06);
+    }
+
+    .msg { margin-top: 10px; color: #6a3e3e; font-size: 13px; }
+    .ok { color: rgba(0,0,0,.65); }
+  </style>
 </head>
-<body>
+
+<body data-active="profile">
+  <!-- Cohesive header (same structure as Laka.html) -->
   <header class="topbar">
     <div class="brand">
       <div class="mark">🌿</div>
@@ -18,362 +115,560 @@
     </div>
 
     <nav class="nav">
-      <a href="Laka.html">Home</a>
-<a href="community.html">Community</a>
-<a href="profile.html">Profile</a>
-
+      <a href="Laka.html" data-page="home">Home</a>
+      <a href="community.html" data-page="community">Community</a>
+      <a href="profile.html" data-page="profile">Profile</a>
     </nav>
 
-    <div class="chip">Account</div>
+    <div class="chip" id="cityChip">San Francisco</div>
   </header>
 
-  <div class="shell shell--no-sidebar">
-    <main class="main">
+  <div class="wrap">
+    <!-- LOGGED OUT VIEW -->
+    <section id="accountView">
       <div class="h1">account</div>
-      <div class="muted" style="font-size:16px; margin-bottom:14px;">
-        Log in to edit your bio, add friends, track events attended, and see your impact.
+      <div class="lead">Log in to edit your bio, add friends, track events attended, and see your impact.</div>
+
+      <div class="grid2" style="margin-top: 16px;">
+        <!-- Login -->
+        <div class="cardish">
+          <div class="h2">log in</div>
+
+          <div class="field">
+            <div class="label">email</div>
+            <input id="loginEmail" class="input" placeholder="you@school.edu" />
+          </div>
+
+          <div class="field">
+            <div class="label">password</div>
+            <input id="loginPass" class="input" type="password" placeholder="••••••••" />
+          </div>
+
+          <div class="btnline">
+            <button class="btnlite primary" id="loginBtn" type="button">log in</button>
+            <button class="btnlite" id="demoBtn" type="button">demo user</button>
+          </div>
+
+          <div class="tiny" style="margin-top:10px;">
+            Hackathon mode: local-only login (no server). Your data lives in this browser.
+          </div>
+          <div id="loginMsg" class="msg"></div>
+        </div>
+
+        <!-- Create Account -->
+        <div class="cardish">
+          <div class="h2">create account</div>
+
+          <div class="field">
+            <div class="label">display name</div>
+            <input id="signName" class="input" placeholder="windtell" />
+          </div>
+
+          <div class="field">
+            <div class="label">username</div>
+            <input id="signUser" class="input" placeholder="windtell-dev" />
+          </div>
+
+          <div class="field">
+            <div class="label">email</div>
+            <input id="signEmail" class="input" placeholder="you@gmail.com" />
+          </div>
+
+          <div class="field">
+            <div class="label">password</div>
+            <input id="signPass" class="input" type="password" placeholder="••••••••" />
+          </div>
+
+          <div class="btnline">
+            <button class="btnlite primary" id="createBtn" type="button">create</button>
+          </div>
+
+          <div class="tiny" style="margin-top:10px;">
+            Tip: usernames should be simple (letters/numbers/hyphens).
+          </div>
+          <div id="createMsg" class="msg"></div>
+        </div>
       </div>
+    </section>
 
-      <div class="panel">
-        <!-- LOGGED OUT -->
-        <div id="viewLoggedOut">
-          <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
-            <div class="panel" style="background: var(--paper);">
-              <div class="h2" style="font-size:22px;">log in</div>
+    <!-- LOGGED IN VIEW -->
+    <section id="profileView" style="display:none;">
+      <div class="phead">
+        <div class="avatar" id="avatarIcon">🌿</div>
+        <div class="pmeta">
+          <div class="h1" style="margin:0;" id="displayName">User</div>
+          <div class="handle" id="handle">@username</div>
 
-              <form id="loginForm" class="form">
-                <div class="field">
-                  <div class="label">email</div>
-                  <input id="loginEmail" class="input" type="email" placeholder="you@school.edu" autocomplete="email"/>
-                </div>
-                <div class="field">
-                  <div class="label">password</div>
-                  <input id="loginPassword" class="input" type="password" placeholder="••••••••" autocomplete="current-password"/>
-                </div>
-                <button class="btn" type="submit">log in</button>
-                <div id="loginMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
-              </form>
-
-              <div class="hr"></div>
-              <div class="muted" style="font-size:13px;">open via: <span class="chip">http://localhost:3000/profile.html</span></div>
-            </div>
-
-            <div class="panel" style="background: var(--paper);">
-              <div class="h2" style="font-size:22px;">create account</div>
-
-              <form id="signupForm" class="form">
-                <div class="field">
-                  <div class="label">display name</div>
-                  <input id="signupDisplayName" class="input" placeholder="windtell"/>
-                </div>
-                <div class="field">
-                  <div class="label">username</div>
-                  <input id="signupUsername" class="input" placeholder="windtell-dev"/>
-                </div>
-                <div class="field">
-                  <div class="label">email</div>
-                  <input id="signupEmail" class="input" type="email" placeholder="you@school.edu"/>
-                </div>
-                <div class="field">
-                  <div class="label">password</div>
-                  <input id="signupPassword" class="input" type="password" placeholder="••••••••"/>
-                </div>
-                <button class="btn" type="submit">create</button>
-                <div id="signupMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
-              </form>
-            </div>
+          <div class="counts">
+            <div class="count"><b id="friendsCount">0</b><span>friends</span></div>
+            <div class="count"><b id="attendedCount">0</b><span>events attended</span></div>
+            <div class="count"><b id="createdCount">0</b><span>events created</span></div>
           </div>
         </div>
 
-        <!-- LOGGED IN -->
-        <div id="viewLoggedIn" style="display:none;">
-          <div class="panel" style="background: var(--paper);">
-            <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
-              <div>
-                <div class="h2" style="font-size:22px;">profile</div>
-                <div id="whoLine" class="muted"></div>
-              </div>
-              <button class="btn" id="logoutBtn" type="button">log out</button>
-            </div>
+        <div style="margin-left:auto;">
+          <button class="btnlite" id="logoutBtn" type="button">log out</button>
+        </div>
+      </div>
 
-            <div class="hr"></div>
+      <div class="grid2" style="margin-top: 18px;">
+        <!-- Bio + Controls -->
+        <div class="cardish">
+          <div class="h2">bio</div>
+          <div class="tiny">Keep it local. What do you care about? How can others join you?</div>
 
-            <div class="panel" style="background: var(--panel);">
-              <div class="h2" style="font-size:22px;">your impact</div>
-              <div class="muted" style="font-size:16px;">
-                Estimated CO₂ saved:
-                <b id="impactKg">0.0</b> kg
-              </div>
-              <div class="muted" style="font-size:13px; margin-top:6px;" id="impactNote">
-                Based on events attended (hackathon estimate).
-              </div>
-            </div>
-
-            <div class="hr"></div>
-
-            <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
-              <div class="panel" style="background: var(--panel);">
-                <div class="h2" style="font-size:22px;">bio</div>
-                <textarea id="bioInput" class="textarea" placeholder="add a short bio..."></textarea>
-                <button class="btn" id="saveBioBtn" type="button" style="margin-top:10px;">save bio</button>
-                <div id="bioMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
-              </div>
-
-              <div class="panel" style="background: var(--panel);">
-                <div class="h2" style="font-size:22px;">friends</div>
-                <div class="muted">total: <span id="friendsCount">0</span></div>
-                <div class="hr"></div>
-
-                <div class="label">add friend username</div>
-                <input id="friendUsername" class="input" placeholder="teammate-name"/>
-                <button class="btn" id="addFriendBtn" type="button" style="margin-top:10px;">add friend</button>
-                <div id="friendMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
-
-                <ul id="friendsList" class="list"></ul>
-              </div>
-            </div>
-
-            <div class="hr"></div>
-
-            <div class="panel" style="background: var(--panel);">
-              <div class="h2" style="font-size:22px;">events attended</div>
-              <div class="muted">total: <span id="eventsCount">0</span></div>
-
-              <div class="hr"></div>
-
-              <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
-                <div>
-                  <div class="label">event title</div>
-                  <input id="eventTitle" class="input" placeholder="neighborhood cleanup"/>
-                  <div class="label" style="margin-top:10px;">date (optional)</div>
-                  <input id="eventDate" class="input" placeholder="2026-02-14"/>
-                  <div class="label" style="margin-top:10px;">location (optional)</div>
-                  <input id="eventLocation" class="input" placeholder="mission district"/>
-                  <button class="btn" id="addEventBtn" type="button" style="margin-top:10px;">add</button>
-                  <div id="eventMsg" class="muted" style="font-size:13px; margin-top:8px;"></div>
-                </div>
-
-                <div>
-                  <ul id="eventsList" class="list"></ul>
-                </div>
-              </div>
-            </div>
-
+          <div class="field">
+            <div class="label">about me</div>
+            <textarea id="bioText" class="textarea" placeholder="e.g., I organize mutual-aid and cleanup walks in the Mission."></textarea>
           </div>
+
+          <div class="btnline">
+            <button class="btnlite primary" id="saveBioBtn" type="button">save bio</button>
+          </div>
+
+          <div id="bioMsg" class="msg ok"></div>
+
+          <div class="hr" style="margin-top:14px;"></div>
+
+          <div class="h2" style="font-size:20px;">friends (demo)</div>
+          <div class="tiny">Hackathon demo: store friend usernames locally.</div>
+
+          <div class="field">
+            <div class="label">add friend</div>
+            <input id="friendInput" class="input" placeholder="friend-username" />
+          </div>
+          <div class="btnline">
+            <button class="btnlite" id="addFriendBtn" type="button">add</button>
+            <button class="btnlite" id="clearFriendsBtn" type="button">clear</button>
+          </div>
+
+          <ul id="friendsList" class="list"></ul>
         </div>
 
+        <!-- Events area -->
+        <div class="cardish">
+          <div class="h2">events</div>
+          <div class="tiny">
+            Create an event here → it will appear under <b>Home → Recent posts</b> (because it saves into laka_posts_v1).
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="h2" style="font-size:20px;">create an event</div>
+
+          <div class="field">
+            <div class="label">title</div>
+            <input id="evTitle" class="input" placeholder="Community cleanup walk" />
+          </div>
+
+<div class="field">
+  <div class="label">when</div>
+  <select id="evWhen" class="select">
+    <option value="today • 5–7 PM">today • 5–7 PM</option>
+    <option value="today • 6–8 PM">today • 6–8 PM</option>
+    <option value="tomorrow • 10–12">tomorrow • 10–12</option>
+    <option value="sat • 10–12">sat • 10–12</option>
+    <option value="sat • 2–4 PM">sat • 2–4 PM</option>
+    <option value="sun • 2–4 PM">sun • 2–4 PM</option>
+    <option value="wed • 6:30–8 PM">wed • 6:30–8 PM</option>
+    <option value="custom">custom…</option>
+  </select>
+
+  <input id="evWhenCustom" class="input" placeholder="type custom time…" style="display:none; margin-top:10px;" />
+</div>
+
+<!-- Preview card -->
+<div class="item" id="eventPreview" style="margin-top:12px;">
+  <div class="title" id="prevTitle">Community cleanup walk <span class="pill">Event</span></div>
+  <div class="meta" id="prevMeta">sat • 10–12</div>
+  <div class="pillrow">
+    <span class="pill subtle">free</span>
+    <span class="pill subtle">transit</span>
+    <span class="pill subtle">SF</span>
+  </div>
+</div>
+
+
+          <div class="field">
+            <div class="label">note</div>
+            <textarea id="evNote" class="textarea" placeholder="Meetup spot, what to bring, accessibility notes…"></textarea>
+          </div>
+
+          <div class="btnline">
+            <button class="btnlite primary" id="createEventBtn" type="button">create event</button>
+          </div>
+
+          <div id="eventMsg" class="msg ok"></div>
+
+          <div class="hr"></div>
+
+          <div class="tabs">
+            <div class="tab active" data-tab="attended">attended</div>
+            <div class="tab" data-tab="created">created</div>
+          </div>
+
+          <div id="attendedPanel">
+            <div class="tiny">Pick from existing Events in your posts list and mark as attended.</div>
+            <div class="field">
+              <div class="label">mark an event attended</div>
+              <select id="attendSelect" class="select"></select>
+            </div>
+            <div class="btnline">
+              <button class="btnlite" id="markAttendedBtn" type="button">mark attended</button>
+              <button class="btnlite" id="clearAttendedBtn" type="button">clear attended</button>
+            </div>
+            <ul id="attendedList" class="list"></ul>
+          </div>
+
+          <div id="createdPanel" style="display:none;">
+            <div class="tiny">Events you created (type = Event).</div>
+            <ul id="createdList" class="list"></ul>
+          </div>
+        </div>
       </div>
-    </main>
+    </section>
   </div>
 
-<script>
-  // ---- helpers ----
-  const $ = (id) => document.getElementById(id);
+  <script>
+    // Keys (shared with Home)
+    const USER_KEY = "laka_user";
+    const FRIENDS_KEY = "laka_friends_v1";
+    const ATTENDED_KEY = "laka_attended_v1";
+    const POSTS_KEY = "laka_posts_v1"; // Home uses this already
 
-  async function api(path, opts = {}) {
-    const res = await fetch(path, {
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      ...opts,
+    function loadJSON(key, fallback){
+      try { return JSON.parse(localStorage.getItem(key) || JSON.stringify(fallback)); }
+      catch { return fallback; }
+    }
+    function saveJSON(key, val){
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+
+    function getUser(){
+      return loadJSON(USER_KEY, null);
+    }
+    function setUser(u){
+      saveJSON(USER_KEY, u);
+    }
+
+    function showLoggedIn(){
+      document.getElementById("accountView").style.display = "none";
+      document.getElementById("profileView").style.display = "block";
+      hydrateProfile();
+    }
+    function showLoggedOut(){
+      document.getElementById("accountView").style.display = "block";
+      document.getElementById("profileView").style.display = "none";
+    }
+
+    // ---- Auth (local-only) ----
+    document.getElementById("createBtn").addEventListener("click", () => {
+      const name = document.getElementById("signName").value.trim() || "User";
+      const username = document.getElementById("signUser").value.trim() || "user";
+      const email = document.getElementById("signEmail").value.trim() || "";
+      const pass = document.getElementById("signPass").value.trim() || "";
+
+      if (!username.match(/^[a-zA-Z0-9-_.]+$/)) {
+        document.getElementById("createMsg").textContent = "Username: letters/numbers/hyphen/underscore only.";
+        return;
+      }
+      if (!email) {
+        document.getElementById("createMsg").textContent = "Please enter an email (demo).";
+        return;
+      }
+      if (!pass) {
+        document.getElementById("createMsg").textContent = "Please enter a password (demo).";
+        return;
+      }
+
+      setUser({ displayName: name, username, email, bio: "" });
+      document.getElementById("createMsg").textContent = "Created ✓ Redirecting…";
+      setTimeout(showLoggedIn, 250);
     });
-    let data = null;
-    try { data = await res.json(); } catch {}
-    if (!res.ok) {
-      const msg = (data && (data.error || data.details)) ? (data.error || data.details) : `HTTP ${res.status}`;
-      throw new Error(msg);
-    }
-    return data;
-  }
 
-  function showLoggedOut() {
-    $("viewLoggedOut").style.display = "";
-    $("viewLoggedIn").style.display = "none";
-  }
-  function showLoggedIn() {
-    $("viewLoggedOut").style.display = "none";
-    $("viewLoggedIn").style.display = "";
-  }
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      const email = document.getElementById("loginEmail").value.trim();
+      const pass = document.getElementById("loginPass").value.trim();
+      if (!email || !pass) {
+        document.getElementById("loginMsg").textContent = "Enter email + password (demo).";
+        return;
+      }
 
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, (c) => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
+      // If user exists, just log them in; else create a quick user
+      const existing = getUser();
+      if (existing && existing.email === email) {
+        document.getElementById("loginMsg").textContent = "Logged in ✓";
+        setTimeout(showLoggedIn, 200);
+        return;
+      }
 
-  function renderFriends(friends) {
-    const ul = $("friendsList");
-    ul.innerHTML = "";
-    if (!friends || friends.length === 0) {
-      ul.innerHTML = `<li class="item"><div class="title">no friends yet</div></li>`;
-      $("friendsCount").textContent = "0";
-      return;
-    }
-    $("friendsCount").textContent = String(friends.length);
-    friends.forEach(f => {
-      const li = document.createElement("li");
-      li.className = "item";
-      li.innerHTML = `<div class="title">${esc(f.display_name)} <span class="meta">@${esc(f.username)}</span></div>`;
-      ul.appendChild(li);
+      setUser({ displayName: "User", username: email.split("@")[0] || "user", email, bio: "" });
+      document.getElementById("loginMsg").textContent = "Logged in ✓";
+      setTimeout(showLoggedIn, 200);
     });
-  }
 
-  function renderEvents(events) {
-    const ul = $("eventsList");
-    ul.innerHTML = "";
-    if (!events || events.length === 0) {
-      ul.innerHTML = `<li class="item"><div class="title">no events yet</div></li>`;
-      $("eventsCount").textContent = "0";
-      return;
-    }
-    $("eventsCount").textContent = String(events.length);
-    events.forEach(ev => {
-      const li = document.createElement("li");
-      li.className = "item";
-      const meta = [ev.event_date, ev.location].filter(Boolean).join(" • ");
-      li.innerHTML = `<div class="title">${esc(ev.event_title)}</div><div class="meta">${esc(meta || "")}</div>`;
-      ul.appendChild(li);
+    document.getElementById("demoBtn").addEventListener("click", () => {
+      setUser({ displayName: "Windtell", username: "windtell-dev", email: "demo@laka.local", bio: "Building local infrastructure awareness in SF." });
+      showLoggedIn();
     });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem(USER_KEY);
+      showLoggedOut();
+    });
+
+    // ---- Profile hydration ----
+    function hydrateProfile(){
+      const u = getUser();
+      if (!u) return;
+
+      document.getElementById("displayName").textContent = u.displayName || "User";
+      document.getElementById("handle").textContent = "@" + (u.username || "user");
+      document.getElementById("bioText").value = u.bio || "";
+
+      // friends
+      renderFriends();
+
+      // events
+      renderEvents();
+    }
+
+    document.getElementById("saveBioBtn").addEventListener("click", () => {
+      const u = getUser();
+      if (!u) return;
+      u.bio = document.getElementById("bioText").value;
+      setUser(u);
+      document.getElementById("bioMsg").textContent = "Saved ✓";
+      setTimeout(() => (document.getElementById("bioMsg").textContent = ""), 1200);
+    });
+
+    // ---- Friends (local demo) ----
+    function renderFriends(){
+      const friends = loadJSON(FRIENDS_KEY, []);
+      document.getElementById("friendsCount").textContent = friends.length;
+
+      const ul = document.getElementById("friendsList");
+      ul.innerHTML = "";
+      if (!friends.length){
+        ul.innerHTML = `<li class="item"><div class="title">No friends yet</div><div class="meta">Add a username to simulate community connections.</div></li>`;
+        return;
+      }
+      friends.forEach(f => {
+        const li = document.createElement("li");
+        li.className = "item";
+        li.innerHTML = `<div class="title">@${escapeHtml(f)}</div><div class="meta">local connection</div>`;
+        ul.appendChild(li);
+      });
+    }
+
+    document.getElementById("addFriendBtn").addEventListener("click", () => {
+      const val = document.getElementById("friendInput").value.trim();
+      if (!val) return;
+      const friends = loadJSON(FRIENDS_KEY, []);
+      if (!friends.includes(val)) friends.push(val);
+      saveJSON(FRIENDS_KEY, friends);
+      document.getElementById("friendInput").value = "";
+      renderFriends();
+    });
+
+    document.getElementById("clearFriendsBtn").addEventListener("click", () => {
+      saveJSON(FRIENDS_KEY, []);
+      renderFriends();
+    });
+
+    // ---- Events integration with Home (laka_posts_v1) ----
+    function loadPosts(){
+      return loadJSON(POSTS_KEY, []);
+    }
+    function savePosts(posts){
+      saveJSON(POSTS_KEY, posts);
+    }
+
+    function renderEvents(){
+      const posts = loadPosts();
+      const created = posts.filter(p => (p.type || "").toLowerCase() === "event");
+      const attendedIds = new Set(loadJSON(ATTENDED_KEY, []));
+      const attended = posts.filter(p => attendedIds.has(p.id));
+
+      document.getElementById("createdCount").textContent = created.length;
+      document.getElementById("attendedCount").textContent = attended.length;
+
+      // Created list
+      const createdList = document.getElementById("createdList");
+      createdList.innerHTML = "";
+      if (!created.length){
+        createdList.innerHTML = `<li class="item"><div class="title">No events created yet</div><div class="meta">Create one above. It will appear on Home → Recent posts.</div></li>`;
+      } else {
+        created.slice().reverse().forEach(p => {
+          const li = document.createElement("li");
+          li.className = "item";
+          li.innerHTML = `
+            <div class="title">${escapeHtml(p.title)} <span class="pill">Event</span></div>
+            <div class="meta">${escapeHtml(p.when || "")}</div>
+            <div class="pillrow">
+              <span class="pill subtle">SF</span>
+              <span class="pill subtle">community-led</span>
+            </div>
+          `;
+          createdList.appendChild(li);
+        });
+      }
+
+      // Attended list
+      const attendedList = document.getElementById("attendedList");
+      attendedList.innerHTML = "";
+      if (!attended.length){
+        attendedList.innerHTML = `<li class="item"><div class="title">No attended events yet</div><div class="meta">Use the selector above to mark one attended for the demo.</div></li>`;
+      } else {
+        attended.slice().reverse().forEach(p => {
+          const li = document.createElement("li");
+          li.className = "item";
+          li.innerHTML = `
+            <div class="title">${escapeHtml(p.title)} <span class="pill subtle">attended</span></div>
+            <div class="meta">${escapeHtml(p.when || "")}</div>
+          `;
+          attendedList.appendChild(li);
+        });
+      }
+
+      // Attend selector (only events)
+      const sel = document.getElementById("attendSelect");
+      sel.innerHTML = "";
+      const eventsOnly = created.length ? created : posts.filter(p => (p.type || "").toLowerCase() === "event");
+      if (!eventsOnly.length){
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "No events available yet";
+        sel.appendChild(opt);
+      } else {
+        eventsOnly.slice().reverse().forEach(p => {
+          const opt = document.createElement("option");
+          opt.value = String(p.id);
+          opt.textContent = `${p.title} — ${p.when || ""}`;
+          sel.appendChild(opt);
+        });
+      }
+    }
+// --- When dropdown + custom input ---
+const evWhenSel = document.getElementById("evWhen");
+const evWhenCustom = document.getElementById("evWhenCustom");
+
+evWhenSel.addEventListener("change", () => {
+  const isCustom = evWhenSel.value === "custom";
+  evWhenCustom.style.display = isCustom ? "block" : "none";
+  updatePreview();
+});
+
+function getWhenValue(){
+  if (evWhenSel.value === "custom") {
+    return (evWhenCustom.value || "").trim();
   }
+  return evWhenSel.value;
+}
 
-  async function refreshImpact(){
-    try{
-      const data = await api("/api/me/impact");
-      $("impactKg").textContent = String(data.kg_saved);
-      $("impactNote").textContent = `Based on ${data.events} event(s) × ${data.kg_per_event} kg/event (hackathon estimate).`;
-    } catch {}
-  }
+// --- Live preview card updates ---
+const prevTitle = document.getElementById("prevTitle");
+const prevMeta = document.getElementById("prevMeta");
 
-  async function refreshAll() {
-    const me = await api("/api/me");
-    const u = me.user;
+function updatePreview(){
+  const t = document.getElementById("evTitle").value.trim() || "Community cleanup walk";
+  const w = getWhenValue() || "sat • 10–12";
+  prevTitle.innerHTML = `${escapeHtml(t)} <span class="pill">Event</span>`;
+  prevMeta.textContent = w;
+}
 
-    showLoggedIn();
+["evTitle","evNote"].forEach(id => {
+  document.getElementById(id).addEventListener("input", updatePreview);
+});
+evWhenCustom.addEventListener("input", updatePreview);
 
-    $("whoLine").innerHTML =
-      `<div><b>${esc(u.display_name)}</b> <span class="muted">@${esc(u.username)}</span></div>` +
-      `<div class="muted">${esc(u.email)}</div>`;
+// init preview once
+updatePreview();
 
-    $("bioInput").value = u.bio || "";
+    document.getElementById("createEventBtn").addEventListener("click", () => {
+      const title = document.getElementById("evTitle").value.trim();
+const when = getWhenValue();
+      const note = document.getElementById("evNote").value.trim();
 
-    const [friends, events] = await Promise.all([
-      api("/api/me/friends"),
-      api("/api/me/events"),
-    ]);
+    if (!title || !when) {
+  document.getElementById("eventMsg").textContent = "Title + when required.";
+  return;
+}
 
-    renderFriends(friends.friends);
-    renderEvents(events.events);
-    await refreshImpact();
-  }
 
-  // ---- auth handlers ----
-  $("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    $("loginMsg").textContent = "";
-    try {
-      await api("/api/login", {
-        method: "POST",
-        body: JSON.stringify({
-          email: $("loginEmail").value.trim(),
-          password: $("loginPassword").value.trim(),
-        }),
-      });
-      await refreshAll();
-    } catch (err) {
-      $("loginMsg").textContent = `login failed: ${err.message}`;
-    }
-  });
+      // Create an Event post into the SAME posts store as Home (so Recent posts updates)
+      const posts = loadPosts();
 
-  $("signupForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    $("signupMsg").textContent = "";
-    try {
-      await api("/api/signup", {
-        method: "POST",
-        body: JSON.stringify({
-          display_name: $("signupDisplayName").value.trim(),
-          username: $("signupUsername").value.trim(),
-          email: $("signupEmail").value.trim(),
-          password: $("signupPassword").value.trim(),
-        }),
-      });
-      await refreshAll();
-    } catch (err) {
-      $("signupMsg").textContent = `signup failed: ${err.message}`;
-    }
-  });
-
-  $("logoutBtn").addEventListener("click", async () => {
-    try { await api("/api/logout", { method: "POST" }); } catch {}
-    showLoggedOut();
-  });
-
-  // ---- actions ----
-  $("saveBioBtn").addEventListener("click", async () => {
-    $("bioMsg").textContent = "";
-    try {
-      await api("/api/me/bio", {
-        method: "POST",
-        body: JSON.stringify({ bio: $("bioInput").value }),
-      });
-      $("bioMsg").textContent = "saved ✓";
-      await refreshAll();
-    } catch (err) {
-      $("bioMsg").textContent = `error: ${err.message}`;
-    }
-  });
-
-  $("addFriendBtn").addEventListener("click", async () => {
-    $("friendMsg").textContent = "";
-    const username = $("friendUsername").value.trim().replace(/^@/, "");
-    if (!username) { $("friendMsg").textContent = "enter a username."; return; }
-
-    try {
-      await api("/api/me/friends/add", {
-        method: "POST",
-        body: JSON.stringify({ username }),
-      });
-      $("friendUsername").value = "";
-      $("friendMsg").textContent = "added ✓";
-      const friends = await api("/api/me/friends");
-      renderFriends(friends.friends);
-    } catch (err) {
-      $("friendMsg").textContent = `error: ${err.message}`;
-    }
-  });
-
-  $("addEventBtn").addEventListener("click", async () => {
-    $("eventMsg").textContent = "";
-    const event_title = $("eventTitle").value.trim();
-    if (!event_title) { $("eventMsg").textContent = "event title required."; return; }
-
-    try {
-      await api("/api/me/events/attend", {
-        method: "POST",
-        body: JSON.stringify({
-          event_title,
-          event_date: $("eventDate").value.trim() || null,
-          location: $("eventLocation").value.trim() || null,
-        }),
+      posts.push({
+        id: Date.now(),
+        title,
+        type: "Event",
+        when,
+        note,
+        // optional map fields (use SF center if you want a pin later)
+        lat: 37.7749,
+        lng: -122.4194
       });
 
-      $("eventTitle").value = "";
-      $("eventDate").value = "";
-      $("eventLocation").value = "";
+      savePosts(posts);
 
-      $("eventMsg").textContent = "added ✓";
-      const events = await api("/api/me/events");
-      renderEvents(events.events);
-      await refreshImpact();
-    } catch (err) {
-      $("eventMsg").textContent = `error: ${err.message}`;
+      document.getElementById("eventMsg").textContent = "Created ✓ (check Home → Recent posts)";
+      document.getElementById("evTitle").value = "";
+     evWhenSel.value = "today • 5–7 PM";
+evWhenCustom.value = "";
+evWhenCustom.style.display = "none";
+updatePreview();
+
+      document.getElementById("evNote").value = "";
+
+      renderEvents();
+      setTimeout(() => (document.getElementById("eventMsg").textContent = ""), 1600);
+    });
+
+    document.getElementById("markAttendedBtn").addEventListener("click", () => {
+      const sel = document.getElementById("attendSelect");
+      const id = Number(sel.value);
+      if (!id) return;
+
+      const attended = loadJSON(ATTENDED_KEY, []);
+      if (!attended.includes(id)) attended.push(id);
+      saveJSON(ATTENDED_KEY, attended);
+      renderEvents();
+    });
+
+    document.getElementById("clearAttendedBtn").addEventListener("click", () => {
+      saveJSON(ATTENDED_KEY, []);
+      renderEvents();
+    });
+
+    // Tabs
+    document.querySelectorAll(".tab").forEach(t => {
+      t.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
+        t.classList.add("active");
+        const which = t.dataset.tab;
+        document.getElementById("attendedPanel").style.display = which === "attended" ? "block" : "none";
+        document.getElementById("createdPanel").style.display = which === "created" ? "block" : "none";
+      });
+    });
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
     }
-  });
 
-  // ---- boot ----
-  (async function boot() {
-    try { await refreshAll(); }
-    catch { showLoggedOut(); }
-  })();
-</script>
+    // Init
+    const u0 = getUser();
+    if (u0) showLoggedIn(); else showLoggedOut();
+
+    // Nav active highlight (optional)
+    (() => {
+      const active = document.body.dataset.active;
+      document.querySelectorAll(".nav a").forEach(a => {
+        if (a.dataset.page === active) a.style.borderBottom = "2px solid currentColor";
+      });
+    })();
+  </script>
 </body>
 </html>

@@ -1,19 +1,12 @@
 const express = require("express");
-console.log("LOADED:", __filename);
-
-app.get("/_debug_routes", (_req, res) => {
-  const routes = app._router.stack
-    .filter(r => r.route)
-    .map(r => Object.keys(r.route.methods)[0].toUpperCase() + " " + r.route.path);
-  res.json({ routes });
-});
-
 const path = require("path");
 const session = require("express-session");
 const bcrypt = require("bcrypt");
 const sqlite3 = require("sqlite3").verbose();
 
-const app = express();
+console.log("LOADED:", __filename);
+
+const app = express(); // ✅ must be before any app.get/app.use
 const db = new sqlite3.Database(path.join(__dirname, "laka.db"));
 
 app.use(express.json());
@@ -33,20 +26,28 @@ app.use((req, _res, next) => {
   next();
 });
 
-// Static files
-app.use(express.static(path.join(__dirname, "public")));
+// ✅ Static files: serve project root (since you removed /public)
+app.use(express.static(__dirname));
+
+/* ------------------ DEBUG ROUTES ------------------ */
+app.get("/_debug_routes", (_req, res) => {
+  const routes = app._router.stack
+    .filter(r => r.route)
+    .map(r => Object.keys(r.route.methods)[0].toUpperCase() + " " + r.route.path);
+  res.json({ routes });
+});
 
 /* ------------------ CLEAN PAGE ROUTES ------------------ */
 app.get("/", (_req, res) => {
-  res.sendFile(path.join(__dirname, "public", "Laka.html"));
+  res.sendFile(path.join(__dirname, "Laka.html"));
 });
 
 app.get("/community", (_req, res) => {
-  res.sendFile(path.join(__dirname, "public", "community.html"));
+  res.sendFile(path.join(__dirname, "community.html"));
 });
 
 app.get("/profile", (_req, res) => {
-  res.sendFile(path.join(__dirname, "public", "profile.html"));
+  res.sendFile(path.join(__dirname, "profile.html"));
 });
 
 /* ------------------ DB setup ------------------ */

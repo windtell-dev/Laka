@@ -4,8 +4,9 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Laka — Home</title>
-<link rel="stylesheet" href="app.css"/>
-<script defer src="app.js"></script>
+<link rel="stylesheet" href="/app.css"/>
+<script defer src="/app.js"></script>
+
 
 
   <!-- Leaflet -->
@@ -151,14 +152,15 @@
   }
 
   // auth check (posting requires login)
-  async function isLoggedIn(){
-    try{
-      const res = await fetch("/api/me", { credentials: "include" });
-      return res.ok;
-    } catch {
-      return false;
-    }
+function isLoggedIn(){
+  try{
+    const u = JSON.parse(localStorage.getItem("laka_user") || "null");
+    return !!(u && u.username);
+  } catch {
+    return false;
   }
+}
+
 
   // --- location ui ---
   const locText = document.getElementById("locText");

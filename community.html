@@ -3,16 +3,72 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Laka — Home</title>
-<link rel="stylesheet" href="app.css"/>
-<script defer src="app.js"></script>
+  <title>Laka — Community</title>
 
+  <link rel="stylesheet" href="/app.css"/>
+  <script defer src="/app.js"></script>
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    .community-shell { display:grid; grid-template-columns: 320px 1fr; gap: 18px; }
+    @media (max-width: 980px){ .community-shell { grid-template-columns: 1fr; } }
+    .panel.soft { background: var(--paper); }
+
+    .chiprow{ display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; align-items:center; }
+    .chipbtn{
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.65);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .chipbtn.active{ background:#111; color:#fff; border-color:#111; }
+    .chipbtn.ghost{ background: transparent; }
+
+    .cards{ display:flex; flex-direction:column; gap:12px; margin-top:14px; }
+    .ccard{
+      border: 1px solid rgba(0,0,0,.10);
+      background: rgba(255,255,255,.68);
+      border-radius: 16px;
+      padding: 14px;
+    }
+    .ccard-top{ display:flex; justify-content:space-between; gap:10px; align-items:flex-start; }
+    .ccard-kicker{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+    .emoji{ font-size:18px; }
+    .klabel{ font-weight: 700; }
+    .pill{
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.05);
+      border: 1px solid rgba(0,0,0,.06);
+    }
+    .pill.subtle{ background: rgba(0,0,0,.03); }
+    .pill.verify{ background: rgba(17,17,17,.06); }
+    .ccard-title{ font-size: 18px; font-weight: 800; margin: 10px 0 6px; }
+    .ccard-desc{ color: rgba(0,0,0,.68); font-size: 14px; line-height: 1.35; }
+    .ccard-meta{ margin-top: 10px; display:flex; flex-wrap:wrap; gap:8px; color: rgba(0,0,0,.60); font-size: 13px; }
+
+    .ccard-actions{ margin-top: 12px; display:flex; flex-wrap:wrap; gap:8px; }
+    .btnlite{
+      border: 1px solid rgba(0,0,0,.12);
+      background: rgba(255,255,255,.85);
+      border-radius: 999px;
+      padding: 8px 12px;
+      cursor:pointer;
+      font-size: 13px;
+    }
+    .btnlite.dark{ background:#111; color:#fff; border-color:#111; }
+
+    .active-link{
+      opacity: 1 !important;
+      border-bottom: 2px solid currentColor;
+      padding-bottom: 2px;
+    }
+  </style>
 </head>
-<body>
+
+<body data-active="community">
   <header class="topbar">
     <div class="brand">
       <div class="mark">🌿</div>
@@ -20,311 +76,270 @@
     </div>
 
     <nav class="nav">
-      <a href="Laka.html">Home</a>
-<a href="community.html">Community</a>
-<a href="profile.html">Profile</a>
-
+      <a href="Laka.html" data-page="home">Home</a>
+      <a href="community.html" data-page="community">Community</a>
+      <a href="profile.html" data-page="profile">Profile</a>
     </nav>
 
     <div class="chip" id="cityChip">San Francisco</div>
   </header>
 
   <div class="shell">
-    <aside class="sidebar">
-      <h3>Near you</h3>
-      <div class="sub">Local fridges, swaps, cleanups — based on your location.</div>
+    <div class="community-shell">
+      <aside class="sidebar">
+        <h3>Ask Laka</h3>
+        <div class="sub">Free, nearby, transit-accessible actions — non-consumption.</div>
 
-      <div class="block">
-        <div class="label">Location</div>
-        <div class="row">
-          <div class="muted" id="locText">Not set yet.</div>
-          <button class="btn small green" id="locBtn">Use my location</button>
-        </div>
+        <div class="block">
+          <div class="label">Prompt</div>
+          <input id="chatInput" class="input" placeholder='e.g. "walkable tonight near Mission"' />
+          <button id="chatSend" class="btn green" style="margin-top:10px; width:100%;">Ask</button>
 
-        <div class="hr"></div>
+          <div class="hr"></div>
 
-        <div class="label">Quick filters</div>
-        <div class="pillrow">
-          <button class="btn small" data-ft="Fridge">Community Fridges</button>
-          <button class="btn small" data-ft="Cleanup">Cleanups</button>
-          <button class="btn small" data-ft="Swap">Free Swaps</button>
-          <button class="btn small" data-ft="Event">Events</button>
-        </div>
-
-        <div class="hr"></div>
-
-        <div class="muted" style="font-size:14px;">
-          Browse freely. To post + track impact, create an account in Profile.
-        </div>
-      </div>
-    </aside>
-
-    <main class="main">
-      <div class="h1">Hello, User...</div>
-
-      <div class="panel">
-        <div class="h2">Dashboard Map</div>
-        <div class="muted">SF-only map. Click the map to choose a pin location, then “Add post”.</div>
-
-        <div class="hr"></div>
-
-        <div class="grid-2">
-          <div>
-            <div class="tabs" style="margin-bottom:12px;">
-              <div class="tab active" data-filter="All">All</div>
-              <div class="tab" data-filter="Fridge">Fridges</div>
-              <div class="tab" data-filter="Cleanup">Cleanup</div>
-              <div class="tab" data-filter="Swap">Swap</div>
-              <div class="tab" data-filter="Event">Event</div>
-            </div>
-
-            <div id="map" class="map"></div>
-          </div>
-
-          <div class="panel" style="background: var(--paper);">
-            <div class="h2" style="font-size:22px;">Add a post (drops a pin)</div>
-            <div class="muted" style="font-size:14px;">Posting requires an account.</div>
-
-            <div class="hr"></div>
-
-            <div class="form">
-              <div class="field">
-                <div class="label">Title</div>
-                <input id="pTitle" class="input" value="Mission Community Fridge restock"/>
-              </div>
-
-              <div class="field">
-                <div class="label">Type</div>
-                <select id="pType" class="select">
-                  <option>Fridge</option>
-                  <option>Cleanup</option>
-                  <option>Swap</option>
-                  <option>Event</option>
-                </select>
-              </div>
-
-              <div class="field">
-                <div class="label">When</div>
-                <input id="pWhen" class="input" value="Today • 5–7 PM"/>
-              </div>
-
-              <div class="field">
-                <div class="label">Note (optional)</div>
-                <textarea id="pNote" class="textarea" placeholder="What's needed? Any details?"></textarea>
-              </div>
-
-              <div class="grid-2" style="grid-template-columns: 1fr 1fr;">
-                <div class="field">
-                  <div class="label">Lat (click map to fill)</div>
-                  <input id="pLat" class="input" value="37.77" />
-                </div>
-                <div class="field">
-                  <div class="label">Lng</div>
-                  <input id="pLng" class="input" value="-122.42" />
-                </div>
-              </div>
-
-              <button class="btn green" id="addPostBtn" type="button">Add post</button>
-              <div class="muted" style="font-size:13px; margin-top:8px;" id="postMsg"></div>
-
-              <div class="hr"></div>
-
-              <div class="h2" style="font-size:18px;">Recent posts</div>
-              <ul id="recentList" class="list"></ul>
-            </div>
+          <div class="label">Response</div>
+          <div id="chatAnswer" class="muted" style="white-space:pre-line; font-size:14px;">
+            Tip: Create an Event in Profile, then ask for “free actions tonight”.
           </div>
         </div>
-      </div>
-    </main>
+
+        <div class="block" style="margin-top:14px;">
+          <div class="label">Feed controls</div>
+          <div class="pillrow">
+            <button class="btn small" id="toggleFree">Free only</button>
+            <button class="btn small" id="toggleWalk">Walkable</button>
+            <button class="btn small" id="toggleTransit">Transit</button>
+          </div>
+          <div class="hr"></div>
+          <div class="muted" style="font-size:13px;">
+            This feed auto-pulls posts/events created in Home/Profile (laka_posts_v1).
+          </div>
+        </div>
+      </aside>
+
+      <main class="main">
+        <div class="h1">Community feed</div>
+
+        <div class="panel soft">
+          <div class="h2">Near you</div>
+          <div class="muted">Seeded examples + your own created posts. Local-first, community-led.</div>
+
+          <div class="hr"></div>
+
+          <div class="chiprow">
+            <button class="chipbtn active" data-filter="All">All</button>
+            <button class="chipbtn" data-filter="Fridge">Fridge</button>
+            <button class="chipbtn" data-filter="Cleanup">Cleanup</button>
+            <button class="chipbtn" data-filter="Swap">Swap</button>
+            <button class="chipbtn" data-filter="Event">Event</button>
+            <span style="flex:1;"></span>
+            <button class="chipbtn ghost" id="resetBtn">Reset</button>
+          </div>
+
+          <div id="cards" class="cards"></div>
+        </div>
+      </main>
+    </div>
   </div>
 
-<script>
-  // --- storage helpers ---
-  const POSTS_KEY = "laka_posts_v1";
-  function loadPosts(){
-    try { return JSON.parse(localStorage.getItem(POSTS_KEY) || "[]"); }
-    catch { return []; }
-  }
-  function savePosts(posts){
-    localStorage.setItem(POSTS_KEY, JSON.stringify(posts));
-  }
-
-  // auth check (posting requires login)
-  async function isLoggedIn(){
-    try{
-      const res = await fetch("/api/me", { credentials: "include" });
-      return res.ok;
-    } catch {
-      return false;
-    }
-  }
-
-  // --- location ui ---
-  const locText = document.getElementById("locText");
-  const locBtn = document.getElementById("locBtn");
-  locText.textContent = (window.getLocationText ? getLocationText() : "Not set yet.");
-
-  locBtn.addEventListener("click", () => {
-    useMyLocation(({ text }) => { locText.textContent = text; });
-  });
-
-  // --- map init (SF-only) ---
-  let map, pinPreview;
-  let currentFilter = "All";
-  const markers = [];
-
-  const SF_CENTER = [37.7749, -122.4194];
-  const SF_BOUNDS = L.latLngBounds(
-    L.latLng(37.708, -122.514), // SW-ish
-    L.latLng(37.832, -122.357)  // NE-ish
-  );
-
-  function markerFor(post){
-    const m = L.marker([post.lat, post.lng]).addTo(map);
-    m.__type = post.type;
-    m.bindPopup(
-      `<b>${escapeHtml(post.title)}</b><br/>
-       <i>${escapeHtml(post.type)}</i><br/>
-       ${escapeHtml(post.when || "")}<br/>
-       <small>${escapeHtml(post.note || "")}</small>`
-    );
-    markers.push(m);
-  }
-
-  function applyFilter(){
-    markers.forEach(m => {
-      const show = (currentFilter === "All") || (m.__type === currentFilter);
-      if (show) m.addTo(map); else map.removeLayer(m);
-    });
-  }
-
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, (c) => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-    }[c]));
-  }
-
-  window.addEventListener("load", () => {
-    map = L.map("map", {
-      maxBounds: SF_BOUNDS,
-      maxBoundsViscosity: 1.0
-    }).setView(SF_CENTER, 12);
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; OpenStreetMap',
-    }).addTo(map);
-
-    map.fitBounds(SF_BOUNDS);
-
-    // click to place preview
-    map.on("click", (e) => {
-      const { lat, lng } = e.latlng;
-      document.getElementById("pLat").value = lat.toFixed(5);
-      document.getElementById("pLng").value = lng.toFixed(5);
-
-      if (pinPreview) map.removeLayer(pinPreview);
-      pinPreview = L.circleMarker([lat, lng], {
-        radius: 8,
-        color: "#6a3e3e",
-        weight: 2,
-        fillColor: "#cddbd2",
-        fillOpacity: 0.9
-      }).addTo(map);
-    });
-
-    // load existing posts
-    refreshPostsUI();
-
-    // filter tabs
-    document.querySelectorAll(".tab").forEach(t => {
-      t.addEventListener("click", () => {
-        document.querySelectorAll(".tab").forEach(x => x.classList.remove("active"));
-        t.classList.add("active");
-        currentFilter = t.dataset.filter;
-        applyFilter();
+  <script>
+    (() => {
+      const active = document.body.dataset.active;
+      document.querySelectorAll(".nav a").forEach(a => {
+        if (a.dataset.page === active) a.classList.add("active-link");
       });
-    });
+    })();
 
-    // quick filter buttons in sidebar (just switch tabs)
-    document.querySelectorAll("[data-ft]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const ft = btn.dataset.ft;
-        document.querySelectorAll(".tab").forEach(x => {
-          const hit = x.dataset.filter === ft;
-          x.classList.toggle("active", hit);
-          if (hit) currentFilter = ft;
+    const POSTS_KEY = "laka_posts_v1";
+
+    function loadUserPostsRaw(){
+      try { return JSON.parse(localStorage.getItem(POSTS_KEY) || "[]"); }
+      catch { return []; }
+    }
+
+    function mapUserPost(p){
+      const type = (p.type || "Event");
+      return {
+        id: p.id || Date.now(),
+        type,
+        title: p.title || "Untitled",
+        hood: "SF",
+        when: p.when || "",
+        cost: "free",
+        dist: 0.9,
+        access: ["transit"],
+        host: "Laka user",
+        desc: p.note || "",
+        verified: false,
+        addressText: "San Francisco"
+      };
+    }
+
+    const seedPosts = [
+      { id: 9001, type:"Fridge", title:"Mission Community Fridge Restock", hood:"Mission", when:"today • 5–7 PM", cost:"free", dist:0.6, access:["walkable","transit"], host:"neighbors (demo)", desc:"Drop produce + shelf-stable items. Need: rice, beans, toiletries. Label allergens if possible.", verified:true, addressText:"24th St, San Francisco" },
+      { id: 9002, type:"Cleanup", title:"Sunset neighborhood cleanup", hood:"Sunset", when:"sat • 10–12", cost:"free", dist:1.2, access:["transit"], host:"green crew (demo)", desc:"Gloves + bags provided. Accessible route available. Meet at corner by the park.", verified:false, addressText:"Irving St, San Francisco" },
+      { id: 9003, type:"Swap", title:"Free swap: books + trinkets", hood:"SoMa", when:"sun • 2–4 PM", cost:"free", dist:2.0, access:["transit"], host:"friends of laka (demo)", desc:"Bring 1, take 1 — or come empty-handed. Keep it kind, keep it usable.", verified:false, addressText:"6th St, San Francisco" },
+      { id: 9004, type:"Event", title:"Repair café: bring a broken thing", hood:"Richmond", when:"wed • 6:30–8 PM", cost:"free", dist:2.4, access:["transit"], host:"community center (demo)", desc:"Volunteers help fix small electronics/clothes. Learn repair basics and share skills.", verified:true, addressText:"Geary Blvd, San Francisco" }
+    ];
+
+    let activeType = "All";
+    let onlyFree = false;
+    let onlyWalk = false;
+    let onlyTransit = false;
+
+    function emoji(type){
+      return ({Fridge:"🥬", Cleanup:"🧤", Swap:"🔁", Event:"🗓️"})[type] || "•";
+    }
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, (c) => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[c]));
+    }
+    function passes(p){
+      if (activeType !== "All" && p.type !== activeType) return false;
+      if (onlyFree && (p.cost || "").toLowerCase() !== "free") return false;
+      if (onlyWalk && !(p.access || []).includes("walkable")) return false;
+      if (onlyTransit && !(p.access || []).includes("transit")) return false;
+      return true;
+    }
+
+    function render(){
+      const el = document.getElementById("cards");
+      const userPosts = loadUserPostsRaw().map(mapUserPost);
+      const combined = [...userPosts.slice().reverse(), ...seedPosts];
+      const filtered = combined.filter(passes);
+
+      if (!filtered.length){
+        el.innerHTML = `
+          <div class="ccard">
+            <div class="ccard-title">No matches</div>
+            <div class="ccard-desc">Try removing toggles or switching the filter.</div>
+          </div>`;
+        return;
+      }
+
+      // Use data-* so we don't break on quotes
+      el.innerHTML = filtered.map(p => `
+        <article class="ccard" data-id="${String(p.id)}">
+          <div class="ccard-top">
+            <div class="ccard-kicker">
+              <span class="emoji">${emoji(p.type)}</span>
+              <span class="klabel">${escapeHtml(p.type)}</span>
+              ${p.verified ? `<span class="pill verify">verified</span>` : ""}
+              <span class="pill">${escapeHtml(p.cost || "free")}</span>
+              ${(p.access || []).includes("walkable") ? `<span class="pill subtle">walkable</span>` : ""}
+              ${(p.access || []).includes("transit") ? `<span class="pill subtle">transit</span>` : ""}
+            </div>
+            <div class="pill subtle">${escapeHtml(p.hood)} • ${Number(p.dist || 0).toFixed(1)} mi</div>
+          </div>
+
+          <div class="ccard-title">${escapeHtml(p.title)}</div>
+          <div class="ccard-desc">${escapeHtml(p.desc || "")}</div>
+
+          <div class="ccard-meta">
+            <span><b>when:</b> ${escapeHtml(p.when || "")}</span>
+            <span><b>host:</b> ${escapeHtml(p.host || "community")}</span>
+          </div>
+
+          <div class="ccard-actions">
+            <button class="btnlite" data-action="save" type="button">save</button>
+            <button class="btnlite" data-action="share" type="button">share</button>
+            <button class="btnlite dark" data-action="ask" type="button"
+              data-title="${escapeHtml(p.title)}"
+              data-when="${escapeHtml(p.when || "")}">
+              ask about this
+            </button>
+          </div>
+        </article>
+      `).join("");
+
+      // attach action listeners (one pass)
+      el.querySelectorAll("[data-action]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const action = btn.dataset.action;
+          if (action === "save") return alert("Saved (demo).");
+
+          if (action === "share") {
+            const card = btn.closest(".ccard");
+            const title = card.querySelector(".ccard-title")?.textContent || "Laka";
+            const when = card.querySelector(".ccard-meta")?.textContent || "";
+            navigator.clipboard?.writeText(`${title}\n${when}`);
+            return alert("Copied!");
+          }
+
+          if (action === "ask") {
+            const title = btn.dataset.title || "";
+            const when = btn.dataset.when || "";
+            prefillChat(title, when);
+          }
         });
-        applyFilter();
+      });
+    }
+
+    document.querySelectorAll("[data-filter]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        activeType = btn.dataset.filter;
+        document.querySelectorAll("[data-filter]").forEach(x => x.classList.remove("active"));
+        btn.classList.add("active");
+        render();
       });
     });
-  });
 
-  function refreshPostsUI(){
-    // clear markers
-    markers.forEach(m => map && map.removeLayer(m));
-    markers.length = 0;
+    const tFree = document.getElementById("toggleFree");
+    const tWalk = document.getElementById("toggleWalk");
+    const tTransit = document.getElementById("toggleTransit");
 
-    const posts = loadPosts();
-    posts.forEach(markerFor);
-    applyFilter();
+    tFree.addEventListener("click", () => { onlyFree = !onlyFree; tFree.classList.toggle("green", onlyFree); render(); });
+    tWalk.addEventListener("click", () => { onlyWalk = !onlyWalk; tWalk.classList.toggle("green", onlyWalk); render(); });
+    tTransit.addEventListener("click", () => { onlyTransit = !onlyTransit; tTransit.classList.toggle("green", onlyTransit); render(); });
 
-    // recent list
-    const ul = document.getElementById("recentList");
-    ul.innerHTML = "";
-    const recent = posts.slice().reverse().slice(0, 6);
-
-    if (recent.length === 0){
-      ul.innerHTML = `<li class="item"><div class="title">No posts yet</div><div class="meta">Add one from the panel.</div></li>`;
-      return;
-    }
-
-    recent.forEach(p => {
-      const li = document.createElement("li");
-      li.className = "item";
-      li.innerHTML = `
-        <div class="title">${escapeHtml(p.title)} <span class="muted">(${escapeHtml(p.type)})</span></div>
-        <div class="meta">${escapeHtml(p.when || "")}</div>
-      `;
-      li.addEventListener("click", () => {
-        map.setView([p.lat, p.lng], 14);
-      });
-      ul.appendChild(li);
+    document.getElementById("resetBtn").addEventListener("click", () => {
+      activeType = "All"; onlyFree = onlyWalk = onlyTransit = false;
+      document.querySelectorAll("[data-filter]").forEach(x => x.classList.remove("active"));
+      document.querySelector('[data-filter="All"]').classList.add("active");
+      tFree.classList.remove("green"); tWalk.classList.remove("green"); tTransit.classList.remove("green");
+      render();
     });
-  }
 
-  // add post
-  document.getElementById("addPostBtn").addEventListener("click", async () => {
-    const msg = document.getElementById("postMsg");
-    msg.textContent = "";
+    window.addEventListener("storage", (e) => { if (e.key === POSTS_KEY) render(); });
+    window.addEventListener("focus", render);
 
-    const ok = await isLoggedIn();
-    if (!ok){
-      msg.textContent = "Please create an account / log in on Profile to post.";
-      msg.style.color = "#6a3e3e";
-      return;
+    // Chat stub
+    const chatInput = document.getElementById("chatInput");
+    const chatAnswer = document.getElementById("chatAnswer");
+    const chatSend = document.getElementById("chatSend");
+
+    function prefillChat(title, when){
+      chatInput.value = `What should I do to join "${title}" (${when})? Give me transit + accessibility tips.`;
+      chatInput.focus();
     }
 
-    const title = document.getElementById("pTitle").value.trim();
-    const type = document.getElementById("pType").value;
-    const when = document.getElementById("pWhen").value.trim();
-    const note = document.getElementById("pNote").value.trim();
-    const lat = parseFloat(document.getElementById("pLat").value);
-    const lng = parseFloat(document.getElementById("pLng").value);
+    // Enter to send
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") chatSend.click();
+    });
 
-    if (!title || Number.isNaN(lat) || Number.isNaN(lng)){
-      msg.textContent = "Title + valid lat/lng required (click the map).";
-      msg.style.color = "#6a3e3e";
-      return;
-    }
+    chatSend.addEventListener("click", async () => {
+      const q = (chatInput.value || "").trim();
+      if (!q) return;
+      chatAnswer.textContent = "Thinking…";
 
-    const posts = loadPosts();
-    posts.push({ id: Date.now(), title, type, when, note, lat, lng });
-    savePosts(posts);
+      const raw = loadUserPostsRaw().slice().reverse();
+      const picks = raw.slice(0, 3);
 
-    msg.textContent = "Posted ✓";
-    msg.style.color = "#444";
-    refreshPostsUI();
-  });
-</script>
+      if (!picks.length){
+        chatAnswer.textContent =
+          "Try creating an Event in Profile first. Then I can recommend free, transit-accessible actions near you.";
+        return;
+      }
+
+      chatAnswer.textContent =
+        "Here are a few free community actions you can do:\n" +
+        picks.map(p => `• ${p.title} — ${p.when || ""}`).join("\n") +
+        "\n\nNext: I can make this a real RAG chatbot via /api/chat.";
+    });
+
+    render();
+  </script>
 </body>
 </html>

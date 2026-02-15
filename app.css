@@ -303,3 +303,130 @@ body{
   background: var(--paper) !important;
   color: var(--ink) !important;
 }
+/* ===============================
+   COMMUNITY PAGE ADDITIONS
+================================ */
+
+.community-controls{
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  flex-wrap:wrap;
+  margin: 1rem 0 1.25rem;
+}
+
+.chips{ display:flex; gap:.5rem; flex-wrap:wrap; align-items:center; }
+.chips.subtle{ opacity:.95; }
+
+.chip{
+  border:1px solid rgba(0,0,0,.10);
+  background:#fff;
+  border-radius:999px;
+  padding:.45rem .75rem;
+  font-size:.9rem;
+  cursor:pointer;
+}
+.chip.outline{ background: transparent; }
+.chip.solid{ background:#111; color:#fff; border-color:#111; }
+.chip.active{ background:#111; color:#fff; border-color:#111; }
+
+.community-grid{
+  display:grid;
+  grid-template-columns: 1fr 1.35fr;
+  gap: 1rem;
+  align-items:start;
+}
+@media (max-width: 980px){
+  .community-grid{ grid-template-columns: 1fr; }
+}
+
+/* map placeholder reused */
+.mapbox{
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:16px;
+  padding:1rem;
+  background: rgba(255,255,255,.55);
+}
+.map-placeholder{
+  padding:.85rem;
+  border-radius:12px;
+  background:#fff;
+  border:1px dashed rgba(0,0,0,.14);
+}
+
+.pins{ margin-top:.75rem; display:flex; flex-direction:column; gap:.6rem; }
+.pin{ display:flex; gap:.6rem; align-items:flex-start; padding:.6rem; border-radius:12px; background:#fff; border:1px solid rgba(0,0,0,.06); }
+.pin-dot{ width:10px; height:10px; border-radius:999px; margin-top:.35rem; background:#999; }
+.pin.fridge .pin-dot{ background:#2f9c6a; }
+.pin.swap .pin-dot{ background:#5b7cfa; }
+.pin.cleanup .pin-dot{ background:#f5a524; }
+.pin.mutualaid .pin-dot{ background:#d86b7a; }
+.pin.meeting .pin-dot{ background:#7c5bd6; }
+.pin-title{ font-weight:600; }
+
+/* cards */
+.card-list{ display:flex; flex-direction:column; gap:.85rem; margin-top: .75rem; }
+
+.community-card{
+  background: rgba(255,255,255,.70);
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 16px;
+  padding: 1rem;
+}
+
+.card-top{ display:flex; flex-direction:column; gap:.15rem; margin-bottom:.5rem; }
+.card-kicker{
+  display:flex; gap:.5rem; align-items:center; flex-wrap:wrap;
+  font-size:.9rem;
+}
+.emoji{ font-size: 1.05rem; }
+.kicker-text{ font-weight:600; }
+.verify{
+  font-size:.75rem;
+  padding:.15rem .5rem;
+  border-radius:999px;
+  border:1px solid rgba(0,0,0,.10);
+  background: rgba(0,0,0,.03);
+}
+.card-title{ font-size:1.1rem; font-weight:650; margin:.25rem 0; }
+.card-desc{ line-height:1.35; }
+
+.card-bottom{
+  margin-top:.75rem;
+  display:flex;
+  justify-content:space-between;
+  gap:1rem;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.pill-row{ display:flex; gap:.4rem; flex-wrap:wrap; }
+.pill{
+  font-size:.78rem;
+  padding:.2rem .55rem;
+  border-radius:999px;
+  background: rgba(0,0,0,.05);
+}
+.pill.subtle{ background: rgba(0,0,0,.035); color: rgba(0,0,0,.7); }
+
+.card-actions{ display:flex; gap:.4rem; }
+.smallbtn{
+  border:1px solid rgba(0,0,0,.12);
+  background:#fff;
+  border-radius:999px;
+  padding:.35rem .65rem;
+  font-size:.85rem;
+  cursor:pointer;
+}
+.smallbtn.primary{
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+
+/* nav active (if you want it) */
+.nav a.active{
+  opacity:1;
+  border-bottom:2px solid currentColor;
+  padding-bottom:.15rem;
+}
