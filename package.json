@@ -21,6 +21,7 @@
   "homepage": "https://github.com/windtell-dev/Laka#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "connect-sqlite3": "^0.9.16",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
     "sqlite3": "^5.1.7"

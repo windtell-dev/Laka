@@ -1,0 +1,110 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Page Background */
+body {
+    font-family: 'Georgia', serif;
+    background-color: #e8e6dc;
+    color: #444;
+}
+
+/* Layout */
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 180px;
+    background-color: #d9d6cb;
+    border-right: 2px solid #6a3e3e;
+    padding-top: 40px;
+}
+
+.sidebar ul {
+    list-style: none;
+    text-align: center;
+}
+
+.sidebar li {
+    margin: 20px 0;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+/* Main Content */
+.main-content {
+    flex: 1;
+    padding: 60px 80px;
+}
+
+/* Logo */
+.logo {
+    text-align: center;
+    font-size: 30px;
+    margin-bottom: 20px;
+}
+
+/* Greeting */
+.greeting {
+    text-align: center;
+    font-size: 60px;
+    font-weight: normal;
+    margin-bottom: 60px;
+}
+
+/* Tasks Section */
+.tasks-section h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.task-list {
+    border: 2px solid #999;
+    padding: 20px;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.circle {
+    width: 40px;
+    height: 40px;
+    border: 2px solid #777;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.task-bar {
+    flex: 1;
+    height: 50px;
+    border: 2px solid #555;
+    background-color: #cfcdbf;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+    text-align: center;
+    font-size: 40px;
+    margin: 40px 0;
+    opacity: 0.6;
+}
+
+/* Lower Section */
+.lower-section {
+    padding-top: 40px;
+}
+
+.placeholder-box {
+    height: 100px;
+    border: 2px solid #6a3e3e;
+    background-color: #d9d6cb;
+}
